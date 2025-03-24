@@ -1,27 +1,31 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
-import { Navbar } from "@/components/navbar";
+import '@/styles/globals.css';
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { ClientLayoutWrapper } from '@/components/client-layout-wrapper';
 
-const inter = Inter({ subsets: ["latin"] });
+// 设置字体
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+});
 
+// 设置元数据
 export const metadata: Metadata = {
-  title: "NFT Marketplace",
-  description: "A modern NFT marketplace built with Next.js and Ethereum",
+  title: 'NFT 市场',
+  description: '一个使用 Next.js 和以太坊构建的现代 NFT 市场应用',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={inter.className} suppressHydrationWarning>
-        <Navbar />
-        <main className="container mx-auto px-4 py-8">
+    <html lang="zh-CN" className={inter.className} suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <ClientLayoutWrapper>
           {children}
-        </main>
+        </ClientLayoutWrapper>
       </body>
     </html>
   );

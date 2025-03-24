@@ -1,88 +1,177 @@
 'use client';
 
 import Image from "next/image";
-import { Button } from "./ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "./ui/card";
-import { Feather as Ethereum, Tag, ShoppingCart } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Feather as Ethereum, Tag, ShoppingCart, Loader2 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import { formatDate, truncateAddress } from '@/lib/utils';
 
-interface NFTCardProps {
-  nft: {
-    id: string;
-    name: string;
-    description: string;
-    image: string;
-    price: string;
-    owner: string;
-  };
-  mode?: 'buy' | 'sell';
+export interface NFTMetadata {
+  name: string;
+  description: string;
+  image: string;
 }
 
-export function NFTCard({ nft, mode = 'buy' }: NFTCardProps) {
-  const [isLoading, setIsLoading] = useState(false);
+export interface NFTItem {
+  nftContract: string;
+  tokenId: number;
+  seller?: string;
+  owner?: string;
+  price?: string;
+  listedTime?: number;
+  metadata?: NFTMetadata;
+}
 
-  const handleAction = async () => {
-    try {
-      setIsLoading(true);
-      if (mode === 'buy') {
-        // TODO: Implement buy logic
-        console.log('Buying NFT:', nft.id);
-      } else {
-        // TODO: Implement sell logic
-        console.log('Listing NFT for sale:', nft.id);
-      }
-    } catch (error) {
-      console.error(`Error ${mode === 'buy' ? 'buying' : 'selling'} NFT:`, error);
-    } finally {
-      setIsLoading(false);
-    }
+interface NFTCardProps {
+  nft: NFTItem;
+  account: string;
+  mode?: 'buy' | 'sell' | 'view';
+  onBuy?: (nft: NFTItem) => void;
+  onList?: (nft: NFTItem) => void;
+  onDelist?: (nft: NFTItem) => void;
+  connected: boolean;
+  loading?: boolean;
+}
+
+export function NFTCard({ 
+  nft, 
+  account, 
+  mode = 'buy', 
+  onBuy, 
+  onList, 
+  onDelist, 
+  connected,
+  loading = false
+}: NFTCardProps) {
+  const isOwner = account.toLowerCase() === (nft.seller || nft.owner || '').toLowerCase();
+  
+  // 设置默认值
+  const metadata = nft.metadata || {
+    name: `NFT #${nft.tokenId}`,
+    description: "No description available",
+    image: "https://via.placeholder.com/300"
   };
 
   return (
-    <Link href={`/nft/${nft.id}`} className="block transition-transform hover:scale-[1.02]">
-      <Card className="overflow-hidden">
-        <CardHeader className="p-0">
-          <div className="relative aspect-square">
-            <Image
-              src={nft.image}
-              alt={nft.name}
-              fill
-              className="object-cover"
-            />
+    <Card className="overflow-hidden transition-all hover:shadow-lg">
+      <div className="aspect-square overflow-hidden relative">
+        <img 
+          src={metadata.image} 
+          alt={metadata.name} 
+          className="w-full h-full object-cover transition-transform hover:scale-105"
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = "https://via.placeholder.com/300?text=No+Image";
+          }}
+        />
+        {nft.price && (
+          <div className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 rounded-md text-sm font-medium flex items-center">
+            <Tag className="h-3.5 w-3.5 mr-1" />
+            {nft.price} CCY
           </div>
-        </CardHeader>
-        <CardContent className="p-4">
-          <CardTitle className="mb-2">{nft.name}</CardTitle>
-          <p className="text-sm text-gray-500">{nft.description}</p>
-        </CardContent>
-        <CardFooter className="flex items-center justify-between p-4 pt-0">
-          <div className="flex items-center">
-            <Ethereum className="mr-1 h-4 w-4" />
-            <span>{nft.price} ETH</span>
+        )}
+      </div>
+      <CardHeader className="p-4">
+        <CardTitle className="text-lg">{metadata.name}</CardTitle>
+        <CardDescription className="h-10 overflow-hidden text-ellipsis">
+          {metadata.description}
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="p-4 pt-0">
+        <div className="space-y-2 text-sm">
+          {nft.listedTime && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">上架时间:</span>
+              <span>{formatDate(nft.listedTime)}</span>
+            </div>
+          )}
+          {(nft.seller || nft.owner) && (
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">
+                {mode === 'buy' ? '卖家:' : '拥有者:'}
+              </span>
+              <span className="truncate max-w-[150px]" title={nft.seller || nft.owner}>
+                {truncateAddress(nft.seller || nft.owner || '')}
+              </span>
+            </div>
+          )}
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Token ID:</span>
+            <span>{nft.tokenId}</span>
           </div>
+        </div>
+      </CardContent>
+      <CardFooter className="p-4 pt-0">
+        {mode === 'buy' && (
+          isOwner ? (
+            <Button 
+              onClick={() => onDelist && onDelist(nft)} 
+              variant="destructive" 
+              className="w-full"
+              disabled={loading || !connected}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  下架中...
+                </>
+              ) : (
+                "下架"
+              )}
+            </Button>
+          ) : (
+            <Button 
+              onClick={() => onBuy && onBuy(nft)} 
+              className="w-full"
+              disabled={loading || !connected}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  购买中...
+                </>
+              ) : (
+                "购买"
+              )}
+            </Button>
+          )
+        )}
+        
+        {mode === 'sell' && (
           <Button 
-            onClick={(e) => {
-              e.preventDefault(); // 防止触发 Link 跳转
-              handleAction();
-            }}
-            disabled={isLoading}
-            variant={mode === 'buy' ? 'default' : 'outline'}
+            onClick={() => onList && onList(nft)} 
+            className="w-full"
+            disabled={loading || !connected}
           >
-            {mode === 'buy' ? (
+            {loading ? (
               <>
-                <ShoppingCart className="mr-2 h-4 w-4" />
-                {isLoading ? 'Processing...' : 'Buy Now'}
+                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                处理中...
               </>
             ) : (
-              <>
-                <Tag className="mr-2 h-4 w-4" />
-                {isLoading ? 'Listing...' : 'Sell'}
-              </>
+              "上架出售"
             )}
           </Button>
-        </CardFooter>
-      </Card>
-    </Link>
+        )}
+        
+        {mode === 'view' && (
+          <Button 
+            variant="outline" 
+            className="w-full"
+            disabled={loading}
+          >
+            {loading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "查看详情"
+            )}
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
 }
+
+export default NFTCard;

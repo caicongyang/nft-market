@@ -2,12 +2,12 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['images.unsplash.com'],
+    domains: ['ipfs.io', 'gateway.ipfs.io', 'cloudflare-ipfs.com'],
   },
   experimental: {
-    serverActions: true,
-    serverComponents: true,
-    appDir: true
+    serverActions: {
+      bodySizeLimit: '2mb'
+    }
   }
 }
 
