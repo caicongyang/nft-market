@@ -102,3 +102,7 @@ web/.netlify
 web/.netlify/
 web/.netlify/functions
 web/.netlify/functions/
+
+
+.env
+.env.local
