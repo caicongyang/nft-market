@@ -9,10 +9,7 @@ contract CCYNFT is ERC721URIStorage, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
-    constructor(string memory name, string memory symbol) 
-        ERC721(name, symbol) 
-        Ownable(msg.sender) 
-    {}
+    constructor(string memory name, string memory symbol) ERC721(name, symbol) {}
 
     function mintNFT(address recipient, string memory tokenURI) 
         public 

@@ -386,8 +386,8 @@ export default function Profile() {
                     onDelist={delistNFT}
                     connected={connected}
                   />
-                ))}
-              </div>
+        ))}
+      </div>
             )}
           </TabsContent>
         </Tabs>

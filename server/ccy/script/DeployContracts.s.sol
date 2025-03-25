@@ -8,6 +8,7 @@ import "../src/NFTMarket.sol";
 
 contract DeployScript is Script {
     function run() external {
+        // 从环境变量读取私钥
         uint256 deployerPrivateKey = vm.envUint("PRIVATE_KEY");
         vm.startBroadcast(deployerPrivateKey);
 

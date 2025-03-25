@@ -61,7 +61,7 @@ contract NFTMarket is ReentrancyGuard, Ownable {
         address indexed seller
     );
     
-    constructor() Ownable(msg.sender) {}
+    constructor() {}
     
     // 设置手续费率
     function setFeePercentage(uint256 _feePercentage) external onlyOwner {
@@ -172,7 +172,7 @@ contract NFTMarket is ReentrancyGuard, Ownable {
     }
     
     // 取消上架（旧方法，保留向后兼容性）
-    function cancelListing(address _nftContract, uint256 _tokenId) external nonReentrant {
+    function cancelListing(address _nftContract, uint256 _tokenId) external {
         delistNFT(_nftContract, _tokenId);
         
         // 触发取消上架事件（向后兼容）
