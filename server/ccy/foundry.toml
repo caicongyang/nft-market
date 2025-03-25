@@ -12,8 +12,10 @@ solc_version = "0.8.20"
 [rpc_endpoints]
 sepolia = "${SEPOLIA_RPC_URL}"
 mainnet = "${ETH_RPC_URL}"
+holesky = "{HOLESKY_RPC_URL}"
 localhost = "http://127.0.0.1:8545"
 
 [etherscan]
 sepolia = { key = "${ETHERSCAN_API_KEY}" }
 mainnet = { key = "${ETHERSCAN_API_KEY}" }
+holesky = { key = "${ETHERSCAN_API_KEY}" }
