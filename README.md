@@ -38,58 +38,58 @@
 
 ## 项目结构
 
-项目根目录/
-├── web/                     # 前端 Next.js 应用
-│   ├── src/
-│   │   ├── app/             # Next.js 应用路由页面
-│   │   │   ├── list/        # NFT 上架页面
-│   │   │   │   └── page.tsx # NFT 上架表单
-│   │   │   ├── profile/     # 用户资料和拥有的 NFT
-│   │   │   │   └── page.tsx # 个人主页
-│   │   │   ├── mint/        # NFT 铸造页面
-│   │   │   │   └── page.tsx # NFT 铸造表单
-│   │   │   ├── nft/         # NFT 详情路由
-│   │   │   │   └── [contract]/[tokenId]/page.tsx # NFT 详情页面
-│   │   │   ├── faucet/      # 代币领取页面
-│   │   │   │   └── page.tsx # 代币水龙头界面
-│   │   │   ├── layout.tsx   # 根布局
-│   │   │   └── page.tsx     # 首页/市场
-│   │   ├── components/      # 组件
-│   │   │   ├── ui/          # 可重用 UI 组件
-│   │   │   │   ├── button.tsx   # 按钮组件
-│   │   │   │   ├── card.tsx     # 卡片组件
-│   │   │   │   ├── input.tsx    # 输入框组件
-│   │   │   │   ├── label.tsx    # 标签组件
-│   │   │   │   ├── tabs.tsx     # 标签页组件
-│   │   │   │   ├── toast.tsx    # 提示组件
-│   │   │   │   ├── toaster.tsx  # 提示容器组件
-│   │   │   │   └── use-toast.ts # 提示钩子
-│   │   │   ├── navbar.tsx   # 导航组件
-│   │   │   ├── NFTCard.tsx  # NFT 显示卡片
-│   │   │   └── Providers.tsx # 全局 Provider 包装器
-│   │   ├── hooks/           # React 钩子
-│   │   │   └── useMarketNFTs.ts # 获取市场 NFT 的钩子
-│   │   ├── lib/             # 实用函数
-│   │   │   ├── abis/        # 合约 ABI
-│   │   │   │   ├── CCYToken.json # ERC20 代币 ABI
-│   │   │   │   ├── CCYNFT.json   # ERC721 NFT ABI
-│   │   │   │   └── NFTMarket.json # NFT 市场 ABI
-│   │   │   └── blockchain.ts # 区块链交互辅助函数
-│   │   ├── styles/          # 全局样式
-│   │   │   └── globals.css  # Tailwind CSS 设置
-│   │   └── types/           # TypeScript 类型定义
-│   │       └── globals.d.ts # 全局类型声明
-│   ├── public/              # 静态资源
-│   ├── package.json         # 项目依赖
-│   ├── next.config.js       # Next.js 配置
-│   ├── tsconfig.json        # TypeScript 配置
-│   └── tailwind.config.js   # Tailwind CSS 配置
+项目根目录/  
+├── web/                     # 前端 Next.js 应用  
+│   ├── src/  
+│   │   ├── app/             # Next.js 应用路由页面  
+│   │   │   ├── list/        # NFT 上架页面  
+│   │   │   │   └── page.tsx # NFT 上架表单  
+│   │   │   ├── profile/     # 用户资料和拥有的 NFT  
+│   │   │   │   └── page.tsx # 个人主页  
+│   │   │   ├── mint/        # NFT 铸造页面  
+│   │   │   │   └── page.tsx # NFT 铸造表单  
+│   │   │   ├── nft/         # NFT 详情路由  
+│   │   │   │   └── [contract]/[tokenId]/page.tsx # NFT 详情页面  
+│   │   │   ├── faucet/      # 代币领取页面  
+│   │   │   │   └── page.tsx # 代币水龙头界面  
+│   │   │   ├── layout.tsx   # 根布局  
+│   │   │   └── page.tsx     # 首页/市场  
+│   │   ├── components/      # 组件  
+│   │   │   ├── ui/          # 可重用 UI 组件  
+│   │   │   │   ├── button.tsx   # 按钮组件  
+│   │   │   │   ├── card.tsx     # 卡片组件  
+│   │   │   │   ├── input.tsx    # 输入框组件  
+│   │   │   │   ├── label.tsx    # 标签组件  
+│   │   │   │   ├── tabs.tsx     # 标签页组件  
+│   │   │   │   ├── toast.tsx    # 提示组件  
+│   │   │   │   ├── toaster.tsx  # 提示容器组件  
+│   │   │   │   └── use-toast.ts # 提示钩子  
+│   │   │   ├── navbar.tsx   # 导航组件  
+│   │   │   ├── NFTCard.tsx  # NFT 显示卡片  
+│   │   │   └── Providers.tsx # 全局 Provider 包装器  
+│   │   ├── hooks/           # React 钩子  
+│   │   │   └── useMarketNFTs.ts # 获取市场 NFT 的钩子  
+│   │   ├── lib/             # 实用函数  
+│   │   │   ├── abis/        # 合约 ABI  
+│   │   │   │   ├── CCYToken.json # ERC20 代币 ABI  
+│   │   │   │   ├── CCYNFT.json   # ERC721 NFT ABI  
+│   │   │   │   └── NFTMarket.json # NFT 市场 ABI  
+│   │   │   └── blockchain.ts # 区块链交互辅助函数  
+│   │   ├── styles/          # 全局样式  
+│   │   │   └── globals.css  # Tailwind CSS 设置  
+│   │   └── types/           # TypeScript 类型定义  
+│   │       └── globals.d.ts # 全局类型声明  
+│   ├── public/              # 静态资源  
+│   ├── package.json         # 项目依赖  
+│   ├── next.config.js       # Next.js 配置  
+│   ├── tsconfig.json        # TypeScript 配置  
+│   └── tailwind.config.js   # Tailwind CSS 配置  
 │
-└── server/                  # 后端智能合约
-    └── ccy/                 # 智能合约目录
-        ├── lib/             # 合约依赖库
-        │   └── forge-std/   # Forge 标准库
-        └── src/             # 合约源码
+└── server/                  # 后端智能合约  
+    └── ccy/                 # 智能合约目录   
+        ├── lib/             # 合约依赖库  
+        │   └── forge-std/   # Forge 标准库  
+        └── src/             # 合约源码  
 
 ## 已实现功能
 
