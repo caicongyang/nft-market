@@ -1,7 +1,8 @@
 {
   "/page": "app/page.js",
+  "/profile/page": "app/profile/page.js",
+  "/nft/[contract]/[tokenId]/page": "app/nft/[contract]/[tokenId]/page.js",
   "/list/page": "app/list/page.js",
   "/faucet/page": "app/faucet/page.js",
-  "/profile/page": "app/profile/page.js",
   "/mint/page": "app/mint/page.js"
 }

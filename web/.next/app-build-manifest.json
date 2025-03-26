@@ -30,6 +30,11 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/faucet/page.js"
+    ],
+    "/nft/[contract]/[tokenId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/nft/[contract]/[tokenId]/page.js"
     ]
   }
 }

@@ -1,24 +1,18 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, use } from 'react';
 import { ethers } from 'ethers';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  History, 
-  BarChart2, 
-  Users, 
   Heart,
   Clock,
-  Tag,
-  Share2,
   Loader2
 } from "lucide-react";
 import Image from "next/image";
 import CCYNFTABI from '@/lib/abis/CCYNFT.json';
 import NFTMarketABI from '@/lib/abis/NFTMarket.json';
-import { useToast } from '@/components/ui/use-toast';
 
 interface NFTMetadata {
   name: string;
@@ -30,21 +24,25 @@ interface NFTMetadata {
   }>;
 }
 
-interface NFTDetailsPageProps {
-  params: {
-    contract: string;
-    tokenId: string;
-  };
+interface ParamsType {
+  contract: string;
+  tokenId: string;
 }
 
-export default function NFTDetailsPage({ params }: NFTDetailsPageProps) {
+interface NFTDetailsPageProps {
+  params: ParamsType | Promise<ParamsType>;
+}
+
+export default function NFTDetailsPage({ params: paramsPromise }: NFTDetailsPageProps) {
+  // 使用React.use()解包params
+  const params = paramsPromise instanceof Promise ? use(paramsPromise) : paramsPromise;
   const { contract, tokenId } = params;
+  
   const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
   const [owner, setOwner] = useState<string>('');
   const [price, setPrice] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
 
   const NFT_MARKET_ADDRESS = process.env.NEXT_PUBLIC_NFT_MARKET_ADDRESS || '';
   
@@ -150,12 +148,12 @@ export default function NFTDetailsPage({ params }: NFTDetailsPageProps) {
         // 尝试从市场合约获取价格
         try {
           const marketContract = new ethers.Contract(NFT_MARKET_ADDRESS, NFTMarketABI, provider);
-          // 使用listedNFTs查询，而不是getListing
+          // 使用listedNFTs查询
           const listing = await marketContract.listedNFTs(contract, tokenId);
           
           if (listing && listing.isActive) {
-            const priceInEth = ethers.utils.formatEther(listing.price);
-            setPrice(priceInEth);
+            const priceValue = ethers.utils.formatEther(listing.price);
+            setPrice(priceValue);
           }
         } catch (error) {
           console.error("获取价格信息失败:", error);
@@ -171,64 +169,6 @@ export default function NFTDetailsPage({ params }: NFTDetailsPageProps) {
     
     fetchNFTData();
   }, [contract, tokenId, NFT_MARKET_ADDRESS]);
-  
-  // 处理购买NFT
-  const handleBuyNFT = async () => {
-    if (!window.ethereum) {
-      toast({
-        title: "需要连接钱包",
-        description: "请安装MetaMask并连接您的钱包以购买NFT",
-        variant: "destructive",
-      });
-      return;
-    }
-    
-    try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
-      const signer = provider.getSigner();
-      
-      // 请求账户访问
-      await provider.send("eth_requestAccounts", []);
-      
-      const marketContract = new ethers.Contract(NFT_MARKET_ADDRESS, NFTMarketABI, signer);
-      
-      // 转换价格为wei
-      const priceInWei = ethers.utils.parseEther(price);
-      
-      toast({
-        title: "交易处理中",
-        description: "请在钱包中确认交易",
-      });
-      
-      // 调用市场合约购买NFT
-      const tx = await marketContract.buyNFT(contract, tokenId, {
-        value: priceInWei
-      });
-      
-      toast({
-        title: "交易已发送",
-        description: "请等待交易确认...",
-      });
-      
-      await tx.wait();
-      
-      toast({
-        title: "购买成功!",
-        description: "您现在拥有此NFT",
-      });
-      
-      // 刷新页面以更新所有者信息
-      window.location.reload();
-      
-    } catch (error) {
-      console.error("购买NFT时出错:", error);
-      toast({
-        title: "购买失败",
-        description: "交易未能完成，请稍后再试",
-        variant: "destructive",
-      });
-    }
-  };
   
   if (loading) {
     return (
@@ -309,16 +249,10 @@ export default function NFTDetailsPage({ params }: NFTDetailsPageProps) {
           {price ? (
             <Card>
               <CardContent className="p-6">
-                <div className="flex items-center justify-between">
+                <div className="flex items-center">
                   <div>
                     <p className="text-sm text-gray-500">当前价格</p>
-                    <p className="text-3xl font-bold">{price} ETH</p>
-                  </div>
-                  <div className="space-x-4">
-                    <Button onClick={handleBuyNFT} className="bg-pink-500 hover:bg-pink-600">
-                      <Tag className="mr-2 h-4 w-4" />
-                      立即购买
-                    </Button>
+                    <p className="text-3xl font-bold">{price} CCY</p>
                   </div>
                 </div>
               </CardContent>
@@ -380,14 +314,6 @@ export default function NFTDetailsPage({ params }: NFTDetailsPageProps) {
               </Card>
             </TabsContent>
           </Tabs>
-        </div>
-      </div>
-
-      {/* 相似NFT建议 */}
-      <div className="space-y-4 mt-12">
-        <h2 className="text-2xl font-bold text-pink-600">您可能喜欢</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {/* 此处可以添加相似NFT卡片组件 */}
         </div>
       </div>
     </div>
