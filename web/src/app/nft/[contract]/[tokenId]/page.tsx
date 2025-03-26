@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,18 +24,14 @@ interface NFTMetadata {
   }>;
 }
 
-interface ParamsType {
-  contract: string;
-  tokenId: string;
-}
-
 interface NFTDetailsPageProps {
-  params: ParamsType | Promise<ParamsType>;
+  params: {
+    contract: string;
+    tokenId: string;
+  };
 }
 
-export default function NFTDetailsPage({ params: paramsPromise }: NFTDetailsPageProps) {
-  // 使用React.use()解包params
-  const params = paramsPromise instanceof Promise ? use(paramsPromise) : paramsPromise;
+export default function NFTDetailsPage({ params }: NFTDetailsPageProps) {
   const { contract, tokenId } = params;
   
   const [metadata, setMetadata] = useState<NFTMetadata | null>(null);
