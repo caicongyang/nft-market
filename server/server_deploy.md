@@ -72,22 +72,22 @@ source .env
 
 使用部署脚本部署到 Sepolia 测试网：
 
-forge script script/DeployContracts.s.sol:DeployScript --rpc-url sepolia --broadcast -vvvv
+forge script script/DeployContracts.s.sol:DeployScript --rpc-url $SEPOLIA_RPC_URL --broadcast -vvvv
 
 
 使用部署脚本部署到 holesky 测试网：
-forge script script/DeployContracts.s.sol:DeployScript --rpc-url holesky --broadcast -vvvv
+forge script script/DeployContracts.s.sol:DeployScript --rpc-url $HOLESKY_RPC_URL --broadcast -vvvv
 
 
 ### 部署到主网（谨慎操作）
 
-forge script script/DeployContracts.s.sol:DeployScript --rpc-url mainnet --broadcast -vvvv
+forge script script/DeployContracts.s.sol:DeployScript --rpc-url $ETH_RPC_URL --broadcast -vvvv
 
 ### 验证合约
 
 添加 --verify 标志自动在 Etherscan 上验证合约：
 
-forge script script/DeployContracts.s.sol:DeployScript --rpc-url holesky --broadcast --verify -vvvv
+forge script script/DeployContracts.s.sol:DeployScript --rpc-url $HOLESKY_RPC_URL --broadcast --verify -vvvv
 
 ## 合约说明
 
