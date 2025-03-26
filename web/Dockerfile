@@ -19,6 +19,10 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 # 复制源代码
 COPY . .
+
+# 添加这一行解决 pino-pretty 问题
+RUN npm install --no-save pino-pretty
+
 # 设置环境变量
 ARG NEXT_PUBLIC_CCY_TOKEN_ADDRESS
 ARG NEXT_PUBLIC_RPC_URL

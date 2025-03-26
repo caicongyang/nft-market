@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 253, 242, 248;
+  --background-end-rgb: 253, 242, 248;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  font-family: 'Nunito', sans-serif;
+}
+
+/* 自定义粉色可爱按钮样式 */
+.cute-button {
+  @apply px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition shadow-md;
+}
+
+/* 卡片悬浮效果 */
+.cute-card {
+  @apply bg-white rounded-lg shadow-lg p-6 transform transition duration-300 hover:scale-105 border-2 border-pink-200;
+}
+
+/* 标题样式 */
+.cute-title {
+  @apply text-pink-600 font-bold;
+}
+
+/* 为标题添加可爱的下划线装饰 */
+.cute-underline {
+  position: relative;
+}
+
+.cute-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  background: linear-gradient(to right, #ec4899, #d946ef, #ec4899);
+  border-radius: 4px;
+} 

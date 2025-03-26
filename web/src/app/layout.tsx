@@ -1,7 +1,9 @@
 import '@/styles/globals.css';
 import type { Metadata } from 'next';
+import '@rainbow-me/rainbowkit/styles.css';
 import { Inter } from 'next/font/google';
 import { ClientLayoutWrapper } from '@/components/client-layout-wrapper';
+import { Providers } from '@/components/Providers';
 
 // 设置字体
 const inter = Inter({
@@ -11,8 +13,8 @@ const inter = Inter({
 
 // 设置元数据
 export const metadata: Metadata = {
-  title: 'NFT 市场',
-  description: '一个使用 Next.js 和以太坊构建的现代 NFT 市场应用',
+  title: '最可爱的女儿 NFT市场',
+  description: '收集和交易最可爱的女儿主题NFT',
 };
 
 export default function RootLayout({
@@ -23,9 +25,11 @@ export default function RootLayout({
   return (
     <html lang="zh-CN" className={inter.className} suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <ClientLayoutWrapper>
-          {children}
-        </ClientLayoutWrapper>
+        <Providers>
+          <ClientLayoutWrapper>
+            {children}
+          </ClientLayoutWrapper>
+        </Providers>
       </body>
     </html>
   );

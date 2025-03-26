@@ -35,7 +35,25 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '2mb'
     }
-  }
+  },
+  // 添加 webpack 配置解决 pino-pretty 问题
+  webpack: (config, { isServer }) => {
+    // 忽略 pino-pretty 相关警告
+    config.ignoreWarnings = [
+      { module: /node_modules\/pino/ }
+    ];
+    
+    // 如果在客户端构建时发现 pino 相关问题
+    if (!isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        pino: false,
+        'pino-pretty': false
+      };
+    }
+    
+    return config;
+  },
 }
 
 module.exports = nextConfig
