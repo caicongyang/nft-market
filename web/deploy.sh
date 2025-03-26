@@ -45,15 +45,15 @@ fi
 
 # 停止并移除旧容器
 echo -e "${BLUE}停止并移除旧容器...${NC}"
-docker-compose down -v 2>/dev/null || true
+docker compose down -v 2>/dev/null || true
 
 # 构建新镜像
 echo -e "${BLUE}构建Docker镜像...${NC}"
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # 启动容器
 echo -e "${BLUE}启动容器...${NC}"
-docker-compose up -d
+docker compose up -d
 
 # 检查容器状态
 echo -e "${BLUE}检查容器状态...${NC}"
