@@ -17,11 +17,16 @@ export interface NFTMetadata {
 export interface NFTItem {
   nftContract: string;
   tokenId: number;
+  owner: string;
   seller?: string;
-  owner?: string;
   price?: string;
   listedTime?: number;
-  metadata?: NFTMetadata;
+  paymentToken?: string;
+  metadata: {
+    name: string;
+    description: string;
+    image: string;
+  };
 }
 
 interface NFTCardProps {

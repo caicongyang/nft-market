@@ -1,30 +1,40 @@
 "use client"
 
 import * as React from "react"
-import { useToast, ToastProvider } from "@/components/ui/use-toast"
-import { Toast } from "@/components/ui/toast"
+import { 
+  Toast, 
+  ToastTitle, 
+  ToastDescription,
+  ToastProvider,
+  ToastViewport
+} from "@/components/ui/toast"
+import { ToastContext, useToast } from "@/components/ui/use-toast"
 
 export function Toaster() {
   const { toasts } = useToast()
 
   return (
-    <div className="fixed top-0 z-[100] flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:max-w-[420px]">
+    <ToastProvider>
       {toasts.map(({ id, title, description, action, ...props }) => (
         <Toast key={id} {...props}>
-          {title && <Toast.Title>{title}</Toast.Title>}
-          {description && <Toast.Description>{description}</Toast.Description>}
-          {action && <Toast.Action>{action}</Toast.Action>}
+          {title && <ToastTitle>{title}</ToastTitle>}
+          {description && <ToastDescription>{description}</ToastDescription>}
+          {action}
         </Toast>
       ))}
-    </div>
+      <ToastViewport />
+    </ToastProvider>
   )
 }
 
-// 使用正确的 ToastProvider
+// 创建完整的 ToastWrapper 组件
 export function ToastWrapper({ children }: { children: React.ReactNode }) {
+  const value = useToast()
+
   return (
-    <ToastProvider>
+    <ToastContext.Provider value={value}>
       {children}
-    </ToastProvider>
+      <Toaster />
+    </ToastContext.Provider>
   )
 } 

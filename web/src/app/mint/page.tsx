@@ -83,11 +83,28 @@ export default function MintNFT() {
       });
       
       const tx = await nftContract.mintNFT(account, tokenURI);
-      await tx.wait();
+      console.log("铸造交易已发送:", tx.hash);
+      
+      const receipt = await tx.wait();
+      console.log("铸造交易已确认:", receipt);
+      
+      // 从事件日志中获取 tokenId
+      let tokenId;
+      try {
+        // 查找 Transfer 事件
+        const transferEvent = receipt.events?.find(event => event.event === 'Transfer');
+        if (transferEvent && transferEvent.args) {
+          // ERC721 Transfer 事件的第三个参数是 tokenId
+          tokenId = transferEvent.args[2].toString();
+          console.log("铸造的 NFT tokenId:", tokenId);
+        }
+      } catch (eventError) {
+        console.error("解析铸造事件失败:", eventError);
+      }
       
       toast({
         title: "铸造成功",
-        description: "您的NFT已成功铸造",
+        description: tokenId ? `您的NFT已成功铸造，TokenID: ${tokenId}` : "您的NFT已成功铸造",
       });
       
       // 清空表单

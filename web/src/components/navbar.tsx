@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Wallet, Plus } from "lucide-react";
+import { Wallet, Plus, Coins } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { usePathname } from 'next/navigation';
@@ -86,6 +86,18 @@ export default function Navbar() {
           >
             我的NFT
           </Link>
+          <Link 
+            href="/mint" 
+            className={`px-3 py-2 ${pathname === '/mint' ? 'text-primary font-medium border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            铸造NFT
+          </Link>
+          <Link 
+            href="/faucet" 
+            className={`px-3 py-2 ${pathname === '/faucet' ? 'text-primary font-medium border-b-2 border-primary' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            代币水龙头
+          </Link>
         </div>
         <div className="ml-auto flex items-center gap-4">
           {!connected ? (
@@ -99,12 +111,20 @@ export default function Navbar() {
               <span>{account.slice(0, 6)}...{account.slice(-4)}</span>
             </div>
           )}
-          <Link href="/list">
-            <Button variant="outline" size="sm">
-              <Plus className="mr-1 h-4 w-4" />
-              上架NFT
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            <Link href="/faucet">
+              <Button variant="outline" size="sm">
+                <Coins className="mr-1 h-4 w-4" />
+                获取代币
+              </Button>
+            </Link>
+            <Link href="/list">
+              <Button variant="outline" size="sm">
+                <Plus className="mr-1 h-4 w-4" />
+                上架NFT
+              </Button>
+            </Link>
+          </div>
         </div>
       </div>
     </nav>

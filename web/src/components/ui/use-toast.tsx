@@ -17,6 +17,8 @@ type ToastProps = {
   action?: ToastActionElement
   variant?: "default" | "destructive"
   duration?: number
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 const actionTypes = {
@@ -191,16 +193,6 @@ type ToastContextType = ReturnType<typeof useToast>
 
 const ToastContext = React.createContext<ToastContextType | null>(null)
 
-function ToastProvider({ children }: { children: React.ReactNode }) {
-  const value = useToast()
-
-  return (
-    <ToastContext.Provider value={value}>
-      {children}
-    </ToastContext.Provider>
-  )
-}
-
 function useToastContext() {
   const context = React.useContext(ToastContext)
 
@@ -214,7 +206,7 @@ function useToastContext() {
 export {
   type ToastProps,
   type ToastActionElement,
-  ToastProvider,
+  ToastContext,
   useToast,
   useToastContext,
   toast,

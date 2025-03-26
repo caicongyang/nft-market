@@ -83,10 +83,10 @@ export default function NFTMarketplace() {
       
       try {
         // 先尝试获取总上架数量
-        const count = await contract.listingCount();
-        console.log("当前上架数量:", count.toString());
+        const nftContractsCount = await contract.getNFTContractsCount();
+        console.log("合约数量:", nftContractsCount.toString());
       } catch (e) {
-        console.error("获取上架数量失败:", e);
+        console.error("获取合约数量失败:", e);
       }
       
       // 获取所有上架的NFT

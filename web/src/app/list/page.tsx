@@ -13,6 +13,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { Loader2, Wallet } from 'lucide-react';
 import Link from 'next/link';
 import NFTCard from '@/components/nft-card';
+import { parseError } from '@/lib/blockchain';
 
 export default function ListNFT() {
   const router = useRouter();
@@ -43,7 +44,8 @@ export default function ListNFT() {
   async function checkConnection() {
     try {
       if (window.ethereum) {
-        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+        const accounts = await provider.listAccounts();
         if (accounts.length > 0) {
           setConnected(true);
           setAccount(accounts[0]);
@@ -95,7 +97,7 @@ export default function ListNFT() {
   async function loadNFTDetails(id: string) {
     setLoadingNFT(true);
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
       const nftContract = new ethers.Contract(CCY_NFT_ADDRESS, CCYNFTABI, provider);
       
       // 检查是否是NFT的所有者
@@ -180,8 +182,35 @@ export default function ListNFT() {
       }
       
       setLoading(true);
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
       const signer = provider.getSigner();
+      
+      // 再次检查是否是NFT的所有者
+      try {
+        const nftContract = new ethers.Contract(CCY_NFT_ADDRESS, CCYNFTABI, provider);
+        const owner = await nftContract.ownerOf(tokenId);
+        console.log("NFT所有者:", owner);
+        console.log("当前账户:", account);
+        
+        if (owner.toLowerCase() !== account.toLowerCase()) {
+          toast({
+            title: "无法上架",
+            description: "您不是该NFT的拥有者，请确认您选择了正确的NFT",
+            variant: "destructive",
+          });
+          setLoading(false);
+          return;
+        }
+      } catch (ownerError) {
+        console.error("检查所有权失败:", ownerError);
+        toast({
+          title: "验证失败",
+          description: "无法验证NFT所有权，请稍后再试",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
       
       // 授权NFT操作权
       const nftContract = new ethers.Contract(CCY_NFT_ADDRESS, CCYNFTABI, signer);
@@ -191,39 +220,85 @@ export default function ListNFT() {
         description: "请在MetaMask中确认NFT授权",
       });
       
-      const approveTx = await nftContract.approve(NFT_MARKET_ADDRESS, tokenId);
-      await approveTx.wait();
+      try {
+        // 先检查是否已授权
+        const isApproved = await nftContract.getApproved(tokenId);
+        console.log("当前授权地址:", isApproved);
+        console.log("市场合约地址:", NFT_MARKET_ADDRESS);
+        
+        if (isApproved.toLowerCase() !== NFT_MARKET_ADDRESS.toLowerCase()) {
+          console.log("需要授权，发送授权交易...");
+          const approveTx = await nftContract.approve(NFT_MARKET_ADDRESS, tokenId);
+          console.log("授权交易已发送:", approveTx.hash);
+          await approveTx.wait();
+          console.log("授权交易已确认");
+        } else {
+          console.log("NFT已授权给市场合约");
+        }
+      } catch (approveError) {
+        console.error("授权NFT失败:", approveError);
+        toast({
+          title: "授权失败",
+          description: "无法授权NFT给市场合约，请稍后再试",
+          variant: "destructive",
+        });
+        setLoading(false);
+        return;
+      }
       
       // 上架NFT
-      const weiPrice = ethers.utils.parseEther(price);
-      const marketContract = new ethers.Contract(NFT_MARKET_ADDRESS, NFTMarketABI, signer);
-      
-      toast({
-        title: "上架中",
-        description: "请在MetaMask中确认上架交易",
-      });
-      
-      const listTx = await marketContract.listNFT(
-        CCY_NFT_ADDRESS,
-        tokenId,
-        CCY_TOKEN_ADDRESS,
-        weiPrice
-      );
-      await listTx.wait();
-      
-      toast({
-        title: "上架成功",
-        description: `NFT #${tokenId} 已成功上架`,
-      });
-      
-      // 跳转到市场页
-      router.push('/');
-      
+      try {
+        const weiPrice = ethers.utils.parseEther(price);
+        const marketContract = new ethers.Contract(NFT_MARKET_ADDRESS, NFTMarketABI, signer);
+        
+        toast({
+          title: "上架中",
+          description: "请在MetaMask中确认上架交易",
+        });
+        
+        console.log("上架参数:", {
+          nftContract: CCY_NFT_ADDRESS,
+          tokenId: tokenId,
+          paymentToken: CCY_TOKEN_ADDRESS,
+          price: weiPrice.toString()
+        });
+        
+        const listTx = await marketContract.listNFT(
+          CCY_NFT_ADDRESS,
+          tokenId,
+          CCY_TOKEN_ADDRESS,
+          weiPrice
+        );
+        
+        console.log("上架交易已发送:", listTx.hash);
+        await listTx.wait();
+        console.log("上架交易已确认");
+        
+        toast({
+          title: "上架成功",
+          description: `NFT #${tokenId} 已成功上架`,
+        });
+        
+        // 跳转到市场页
+        router.push('/');
+      } catch (listError: any) {
+        console.error("上架NFT失败:", listError);
+        let errorMessage = "无法完成NFT上架";
+        
+        // 使用错误解析函数获取更友好的错误消息
+        errorMessage = parseError(listError);
+        
+        toast({
+          title: "上架失败",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } catch (error) {
-      console.error("Failed to list NFT:", error);
+      console.error("处理上架过程发生错误:", error);
       toast({
         title: "上架失败",
-        description: "无法完成NFT上架",
+        description: parseError(error),
         variant: "destructive",
       });
     } finally {
