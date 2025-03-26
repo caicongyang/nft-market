@@ -58,7 +58,7 @@ nginx -g "daemon off;"\n'\
 > /start.sh && chmod +x /start.sh
 
 # 暴露端口
-EXPOSE 80
+EXPOSE 8081
 
 # 设置启动命令
 CMD ["/start.sh"] 
