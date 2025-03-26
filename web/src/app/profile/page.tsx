@@ -88,7 +88,7 @@ export default function Profile() {
   async function checkConnection() {
     try {
       if (typeof window !== 'undefined' && window.ethereum) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+        const provider = new ethers.providers.Web3Provider(window.ethereum as any);
         const accounts = await provider.listAccounts();
         if (accounts.length > 0) {
           setConnected(true);
@@ -138,7 +138,7 @@ export default function Profile() {
   
   async function loadBalance(userAddress: string) {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
       const balance = await provider.getBalance(userAddress);
       setBalance(ethers.utils.formatEther(balance));
     } catch (error) {
@@ -151,7 +151,7 @@ export default function Profile() {
     try {
       // 先尝试检查链上状态是否正常，如果不正常则提早返回
       try {
-        const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+        const provider = new ethers.providers.Web3Provider(window.ethereum as any);
         await provider.getNetwork();
       } catch (networkError) {
         console.error("Network error, cannot load NFTs:", networkError);
@@ -164,7 +164,7 @@ export default function Profile() {
         return;
       }
       
-      const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
       const nftContract = new ethers.Contract(CCY_NFT_ADDRESS, CCYNFTABI, provider);
       
       // 大幅减少检查的 token 数量，避免 RPC 过载
@@ -259,7 +259,7 @@ export default function Profile() {
       let metadata = {
         name: `NFT #${tokenId}`,
         description: "No description available",
-        image: "https://via.placeholder.com/300"
+        image: "/images/placeholder-nft.jpg"
       };
       
       try {
@@ -338,7 +338,7 @@ export default function Profile() {
 
   async function loadListedNFTs(userAddress: string) {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
       const marketContract = new ethers.Contract(NFT_MARKET_ADDRESS, NFTMarketABI, provider);
       
       // 获取所有活跃上架的 NFT
@@ -405,7 +405,7 @@ export default function Profile() {
     let metadata = {
       name: `NFT #${tokenId}`,
       description: "No description available",
-      image: "https://via.placeholder.com/300"
+      image: "/images/placeholder-nft.jpg"
     };
     
     try {
@@ -480,7 +480,7 @@ export default function Profile() {
   
   async function delistNFT(nft: NFTItem) {
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
       const signer = provider.getSigner();
       
       toast({
@@ -613,8 +613,8 @@ export default function Profile() {
                     onDelist={delistNFT}
                     connected={connected}
                   />
-                ))}
-              </div>
+        ))}
+      </div>
             )}
           </TabsContent>
         </Tabs>

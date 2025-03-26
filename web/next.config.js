@@ -28,7 +28,7 @@ const nextConfig = {
   },
   // 静态资源优化
   images: {
-    domains: ['ipfs.io', 'infura-ipfs.io'], // 根据需要添加你的图像源
+    domains: ['ipfs.io', 'infura-ipfs.io', 'img.picgo.net'], // 添加 img.picgo.net
     formats: ['image/avif', 'image/webp'],
   },
   experimental: {

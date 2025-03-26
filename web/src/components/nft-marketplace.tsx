@@ -110,7 +110,7 @@ export default function NFTMarketplace() {
         let metadata: NFTMetadata = {
           name: `NFT #${item.tokenId}`,
           description: "No description available",
-          image: "https://via.placeholder.com/300"
+          image: "/images/placeholder-nft.jpg"
         };
         
         if (tokenURI) {

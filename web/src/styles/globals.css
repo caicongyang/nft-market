@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -78,4 +80,81 @@
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+}
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 253, 242, 248;
+  --background-end-rgb: 253, 242, 248;
+}
+
+body {
+  color: rgb(var(--foreground-rgb));
+  background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+  font-family: 'Nunito', sans-serif;
+}
+
+/* 解决布局偏移问题 */
+html {
+  overflow-y: scroll;
+}
+
+/* 添加平滑过渡效果 */
+* {
+  transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow, transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+/* 防止布局偏移的CSS修复 */
+.layout-stable {
+  content-visibility: auto;
+  contain-intrinsic-size: auto;
+}
+
+/* 图片加载动画 */
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+img {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* 自定义粉色可爱按钮样式 */
+.cute-button {
+  @apply px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition shadow-md;
+}
+
+/* 卡片悬浮效果 */
+.cute-card {
+  @apply bg-white rounded-lg shadow-lg p-6 transform transition duration-300 hover:scale-105 border-2 border-pink-200;
+}
+
+/* 标题样式 */
+.cute-title {
+  @apply text-pink-600 font-bold;
+}
+
+/* 为标题添加可爱的下划线装饰 */
+.cute-underline {
+  position: relative;
+}
+
+.cute-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  background: linear-gradient(to right, #ec4899, #d946ef, #ec4899);
+  border-radius: 4px;
 } 

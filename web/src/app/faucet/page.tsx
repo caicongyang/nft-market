@@ -35,7 +35,7 @@ export default function TokenFaucet() {
   async function checkConnection() {
     try {
       if (window.ethereum) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+        const provider = new ethers.providers.Web3Provider(window.ethereum as any);
         const accounts = await provider.listAccounts();
         if (accounts.length > 0) {
           setConnected(true);
@@ -83,10 +83,19 @@ export default function TokenFaucet() {
   async function loadTokenBalance() {
     setLoadingBalance(true);
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+      // 强制刷新provider的连接
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
+      
+      // 强制重新连接并获取最新区块
+      await provider.detectNetwork();
+      const blockNumber = await provider.getBlockNumber();
+      console.log("当前区块:", blockNumber);
+      
       const tokenContract = new ethers.Contract(CCY_TOKEN_ADDRESS, CCYTokenABI, provider);
       
+      // 尝试获取余额
       const userBalance = await tokenContract.balanceOf(account);
+      console.log(`加载代币余额: ${ethers.utils.formatEther(userBalance)} CCY`);
       setBalance(ethers.utils.formatEther(userBalance));
     } catch (error) {
       console.error("加载代币余额失败:", error);
@@ -106,11 +115,10 @@ export default function TokenFaucet() {
         return;
       }
       
-      // 使用提供的水龙头API或合约来获取代币
-      // 此处我们需要调用后端API，因为我们需要使用合约拥有者的钱包来mint代币
       setLoading(true);
       
-      const response = await fetch('/api/faucet', {
+      // 首先尝试新的direct-mint API
+      const response = await fetch('/api/direct-mint', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,20 +129,48 @@ export default function TokenFaucet() {
         }),
       });
       
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || '请求代币失败');
-      }
-      
       const data = await response.json();
+
+      if (!response.ok) {
+        console.error("水龙头API错误:", data);
+        
+        let errorMessage = data.error || '请求代币失败';
+        let errorDetails = '';
+        
+        if (data.details) {
+          errorDetails = data.details;
+        } else if (data.debug) {
+          errorDetails = "API调试信息: " + JSON.stringify(data.debug);
+        }
+        
+        toast({
+          title: errorMessage,
+          description: errorDetails,
+          variant: "destructive",
+        });
+        return;
+      }
       
       toast({
         title: "请求成功",
-        description: `已向您的钱包发送 ${amount} CCY代币`,
+        description: `已向您的钱包发送 ${amount} CCY代币。交易哈希: ${data.transactionHash?.slice(0, 10)}...`,
       });
       
-      // 重新加载余额
-      await loadTokenBalance();
+      // 等待交易确认后再刷新余额
+      await new Promise(resolve => setTimeout(resolve, 5000));
+      
+      // 多次尝试刷新余额，确保获取到最新状态
+      let retryCount = 0;
+      const maxRetries = 3;
+      
+      while (retryCount < maxRetries) {
+        await loadTokenBalance();
+        retryCount++;
+        
+        if (retryCount < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+      }
     } catch (error) {
       console.error("请求代币失败:", error);
       toast({
@@ -196,7 +232,18 @@ export default function TokenFaucet() {
               <div className="p-4 rounded-md bg-muted">
                 <div className="flex justify-between items-center">
                   <span className="text-sm font-medium">CCY代币余额:</span>
-                  {loadingBalance ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={loadTokenBalance} 
+                    disabled={loadingBalance}
+                    className="h-6 px-2"
+                  >
+                    {loadingBalance ? 
+                      <Loader2 className="h-3 w-3 animate-spin" /> : 
+                      <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 2v6h-6"></path><path d="M3 12a9 9 0 0 1 15-6.7L21 8"></path><path d="M3 22v-6h6"></path><path d="M21 12a9 9 0 0 1-15 6.7L3 16"></path></svg>
+                    }
+                  </Button>
                 </div>
                 <p className="text-xl font-bold">{balance} CCY</p>
               </div>

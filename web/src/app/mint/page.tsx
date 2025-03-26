@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ethers } from 'ethers';
 import { useToast } from '@/components/ui/use-toast';
 import { Button } from '@/components/ui/button';
@@ -11,16 +11,94 @@ import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
 import CCYNFTABI from '@/lib/abis/CCYNFT.json';
 
+// 简化类型定义，避免扩展window对象
+type EthereumProvider = {
+  isMetaMask?: boolean;
+  request: (args: { method: string; params?: any[] }) => Promise<any>;
+  on: (event: string, callback: (...args: any[]) => void) => void;
+  removeListener: (event: string, callback: (...args: any[]) => void) => void;
+}
+
 export default function MintNFT() {
   const [connected, setConnected] = useState(false);
   const [account, setAccount] = useState('');
   const [loading, setLoading] = useState(false);
+  const [checkingConnection, setCheckingConnection] = useState(true);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const { toast } = useToast();
 
   const CCY_NFT_ADDRESS = process.env.NEXT_PUBLIC_CCY_NFT_ADDRESS || '';
+
+  // 页面加载时自动检查钱包连接状态
+  useEffect(() => {
+    async function checkConnection() {
+      try {
+        if (typeof window !== 'undefined' && window.ethereum) {
+          // 检查是否已连接
+          const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+          const accounts = await provider.listAccounts();
+          
+          if (accounts.length > 0) {
+            setConnected(true);
+            setAccount(accounts[0]);
+            console.log("自动检测到已连接的钱包:", accounts[0]);
+          }
+        }
+      } catch (error) {
+        console.error("检查钱包连接状态时出错:", error);
+      } finally {
+        setCheckingConnection(false);
+      }
+    }
+    
+    checkConnection();
+    
+    // 监听钱包连接变化事件
+    function handleAccountsChanged(accounts: string[]) {
+      if (accounts.length > 0) {
+        setConnected(true);
+        setAccount(accounts[0]);
+        console.log("钱包账户变更:", accounts[0]);
+        
+        toast({
+          title: "钱包已更新",
+          description: `当前账户: ${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`,
+        });
+      } else {
+        setConnected(false);
+        setAccount('');
+        console.log("钱包已断开连接");
+        
+        toast({
+          title: "钱包已断开",
+          description: "请重新连接您的钱包",
+          variant: "destructive",
+        });
+      }
+    }
+    
+    // 使用更安全的方式检查和处理以太坊提供程序
+    const ethereum = window?.ethereum as EthereumProvider | undefined;
+    
+    if (ethereum) {
+      ethereum.on('accountsChanged', handleAccountsChanged);
+      
+      // 监听网络变化
+      ethereum.on('chainChanged', (_chainId: string) => {
+        console.log("网络已切换，页面将重新加载");
+        window.location.reload();
+      });
+    }
+    
+    // 清理函数，移除事件监听器
+    return () => {
+      if (ethereum) {
+        ethereum.removeListener('accountsChanged', handleAccountsChanged);
+      }
+    };
+  }, [toast]);  // 添加toast作为依赖项
 
   async function connectWallet() {
     try {
@@ -39,7 +117,7 @@ export default function MintNFT() {
           variant: "destructive",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to connect wallet:", error);
       toast({
         title: "连接失败",
@@ -73,7 +151,7 @@ export default function MintNFT() {
       // 这里我们简化为直接使用JSON字符串
       const tokenURI = `data:application/json;base64,${btoa(JSON.stringify(metadata))}`;
       
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
       const signer = provider.getSigner();
       const nftContract = new ethers.Contract(CCY_NFT_ADDRESS, CCYNFTABI, signer);
       
@@ -128,7 +206,12 @@ export default function MintNFT() {
     <div className="container mx-auto py-8 px-4">
       <h1 className="text-3xl font-bold mb-8">铸造新NFT</h1>
       
-      {!connected ? (
+      {checkingConnection ? (
+        <div className="text-center py-16 border rounded-lg bg-muted/20">
+          <Loader2 className="mx-auto h-8 w-8 animate-spin text-pink-500" />
+          <p className="mt-4 text-lg text-gray-600">正在检查钱包连接状态...</p>
+        </div>
+      ) : !connected ? (
         <div className="text-center py-16 border rounded-lg bg-muted/20">
           <h3 className="text-xl mb-4">请先连接您的钱包</h3>
           <Button onClick={connectWallet}>连接钱包</Button>
@@ -177,7 +260,7 @@ export default function MintNFT() {
                     alt="NFT Preview" 
                     className="h-full w-full object-cover"
                     onError={(e) => {
-                      e.currentTarget.src = 'https://via.placeholder.com/150?text=Invalid+URL';
+                      e.currentTarget.src = '/images/placeholder-nft.jpg';
                     }}
                   />
                 </div>

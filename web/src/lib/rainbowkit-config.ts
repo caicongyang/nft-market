@@ -10,40 +10,20 @@ import {
 } from '@rainbow-me/rainbowkit';
 import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import { 
-  mainnet, sepolia, goerli, 
-  // 移除错误的导入
-  // chain as localChain,
+  holesky
 } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 
-// 创建本地测试网络配置 - 直接创建对象，不使用chain
-const localNetwork = {
-  id: 31337,
-  name: 'Local Network',
-  network: 'localhost',
-  nativeCurrency: {
-    decimals: 18,
-    name: 'Ethereum',
-    symbol: 'ETH',
-  },
-  rpcUrls: {
-    default: { http: ['http://127.0.0.1:8545'] },
-    public: { http: ['http://127.0.0.1:8545'] },
-  },
-};
+// 获取Alchemy RPC URL
+const rpcUrl = process.env.NEXT_PUBLIC_RPC_URL || 'https://ethereum-holesky-rpc.publicnode.com';
 
 // 配置支持的链
 const { chains, publicClient, webSocketPublicClient } = configureChains(
+  [holesky],
   [
-    // 仅使用本地网络进行开发，避免多链造成的复杂性
-    // mainnet, sepolia, goerli, 
-    localNetwork,
-  ],
-  [
-    // 简化提供者配置
     jsonRpcProvider({
-      rpc: () => ({ http: 'http://127.0.0.1:8545' }),
+      rpc: () => ({ http: rpcUrl }),
     }),
     publicProvider(),
   ]
@@ -51,8 +31,7 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
 
 // 配置钱包
 const { connectors } = getDefaultWallets({
-  appName: 'NFT Marketplace',
-  // 如果没有ProjectID，使用固定字符串
+  appName: '最可爱的女儿 NFT市场',
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
   chains
 });

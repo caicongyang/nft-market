@@ -1,15 +1,13 @@
 import '@/styles/globals.css';
-import type { Metadata } from 'next';
 import '@rainbow-me/rainbowkit/styles.css';
+import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ClientLayoutWrapper } from '@/components/client-layout-wrapper';
 import { Providers } from '@/components/Providers';
+import Navbar from '@/components/navbar';
 
 // 设置字体
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-});
+const inter = Inter({ subsets: ['latin'] });
 
 // 设置元数据
 export const metadata: Metadata = {
@@ -26,9 +24,8 @@ export default function RootLayout({
     <html lang="zh-CN" className={inter.className} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <Providers>
-          <ClientLayoutWrapper>
-            {children}
-          </ClientLayoutWrapper>
+          <Navbar />
+          {children}
         </Providers>
       </body>
     </html>

@@ -44,7 +44,7 @@ export default function ListNFT() {
   async function checkConnection() {
     try {
       if (window.ethereum) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+        const provider = new ethers.providers.Web3Provider(window.ethereum as any);
         const accounts = await provider.listAccounts();
         if (accounts.length > 0) {
           setConnected(true);
@@ -97,7 +97,7 @@ export default function ListNFT() {
   async function loadNFTDetails(id: string) {
     setLoadingNFT(true);
     try {
-      const provider = new ethers.providers.Web3Provider(window.ethereum as ethers.providers.ExternalProvider);
+      const provider = new ethers.providers.Web3Provider(window.ethereum as any);
       const nftContract = new ethers.Contract(CCY_NFT_ADDRESS, CCYNFTABI, provider);
       
       // 检查是否是NFT的所有者
@@ -118,7 +118,7 @@ export default function ListNFT() {
       let metadata = {
         name: `NFT #${id}`,
         description: "No description available",
-        image: "https://via.placeholder.com/300"
+        image: "/images/placeholder-nft.jpg"
       };
       
       if (tokenURI) {

@@ -1,6 +1,8 @@
-# NFT 市场
+# 最可爱的女儿 NFT 市场
 
 这是一个现代化的、功能完备的 NFT 市场应用，使用 Next.js 和以太坊构建。该应用允许用户通过直观美观的界面购买、出售和管理他们的 NFT 收藏品。
+
+![NFT市场应用截图](web/public/images/image.png)
 
 ## 项目架构
 
@@ -25,7 +27,7 @@
 - **shadcn/ui** - 基于 Radix UI 和 Tailwind 构建的可重用 UI 组件
 - **Lucide React** - 美观一致的图标集
 - **ethers.js** - 与区块链交互的以太坊库
-- **MetaMask** - 以太坊交易的钱包集成
+- **RainbowKit** - 用户友好的钱包连接组件库
 
 ### 后端 (Server)
 
@@ -44,6 +46,12 @@
 │   │   │   │   └── page.tsx # NFT 上架表单
 │   │   │   ├── profile/     # 用户资料和拥有的 NFT
 │   │   │   │   └── page.tsx # 个人主页
+│   │   │   ├── mint/        # NFT 铸造页面
+│   │   │   │   └── page.tsx # NFT 铸造表单
+│   │   │   ├── nft/         # NFT 详情路由
+│   │   │   │   └── [contract]/[tokenId]/page.tsx # NFT 详情页面
+│   │   │   ├── faucet/      # 代币领取页面
+│   │   │   │   └── page.tsx # 代币水龙头界面
 │   │   │   ├── layout.tsx   # 根布局
 │   │   │   └── page.tsx     # 首页/市场
 │   │   ├── components/      # 组件
@@ -57,14 +65,16 @@
 │   │   │   │   ├── toaster.tsx  # 提示容器组件
 │   │   │   │   └── use-toast.ts # 提示钩子
 │   │   │   ├── navbar.tsx   # 导航组件
-│   │   │   ├── nft-card.tsx # NFT 显示卡片
-│   │   │   └── nft-marketplace.tsx # 主市场组件
+│   │   │   ├── NFTCard.tsx  # NFT 显示卡片
+│   │   │   └── Providers.tsx # 全局 Provider 包装器
+│   │   ├── hooks/           # React 钩子
+│   │   │   └── useMarketNFTs.ts # 获取市场 NFT 的钩子
 │   │   ├── lib/             # 实用函数
 │   │   │   ├── abis/        # 合约 ABI
 │   │   │   │   ├── CCYToken.json # ERC20 代币 ABI
 │   │   │   │   ├── CCYNFT.json   # ERC721 NFT ABI
 │   │   │   │   └── NFTMarket.json # NFT 市场 ABI
-│   │   │   └── utils.ts     # 辅助函数
+│   │   │   └── blockchain.ts # 区块链交互辅助函数
 │   │   ├── styles/          # 全局样式
 │   │   │   └── globals.css  # Tailwind CSS 设置
 │   │   └── types/           # TypeScript 类型定义
@@ -89,34 +99,34 @@
 - ✅ 详细的 NFT 查看页面
 - ✅ 市场和个人资料页面之间的导航
 - ✅ 适应所有屏幕尺寸的响应式设计
-- ✅ MetaMask 钱包集成
+- ✅ RainbowKit 钱包集成
 - ✅ NFT 上架和下架功能
-- ✅ 使用 ERC20 代币购买 NFT
+- ✅ 使用 ETH 购买 NFT
 
 ### NFT 管理
 - ✅ 个人 NFT 收藏视图
 - ✅ 带表单验证的 NFT 创建界面
-- ✅ 基本钱包连接 UI
+- ✅ 用户友好的钱包连接 UI
 - ✅ 买/卖按钮界面
 
 ### NFT 详情页
 - ✅ 大图显示
 - ✅ 详细的 NFT 信息
-- ✅ 价格历史标签页
+- ✅ 价格显示
 - ✅ 属性/特性显示
-- ✅ 交易历史视图
+- ✅ 支持多种元数据格式（IPFS、HTTP、Base64）
 
 ## 计划功能
 
 ### 智能合约集成
-- ✅ MetaMask 钱包集成
+- ✅ RainbowKit 钱包集成
 - ✅ NFT 铸造功能
 - ✅ 买/卖交易处理
 - 🔄 实时价格更新
 - ✅ 交易确认处理
 
 ### 用户功能
-- �� 用户认证
+- ✅ 用户认证
 - 🔄 个人资料定制
 - 🔄 收藏夹/关注列表
 - 🔄 出价系统
@@ -140,8 +150,10 @@
 ### 前端设置
 
 1. 安装依赖：
+   ```bash
    cd web
    npm install
+   ```
 
 2. 设置环境变量：
    在 web 目录下创建 `.env.local` 文件：
@@ -149,30 +161,31 @@
    NEXT_PUBLIC_NFT_MARKET_ADDRESS=你的_nft_市场合约地址
    NEXT_PUBLIC_CCY_TOKEN_ADDRESS=你的_ccy_代币合约地址
    NEXT_PUBLIC_CCY_NFT_ADDRESS=你的_ccy_nft合约地址
+   NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID=你的_walletconnect_项目ID
+   NEXT_PUBLIC_RPC_URL=你的_rpc_url
    ```
 
 3. 启动开发服务器：
+   ```bash
    npm run dev
+   ```
 
 4. 打开 http://localhost:3000
 
 ### 后端设置
 
 1. 安装 Foundry（如果尚未安装）：
+   ```bash
    curl -L https://foundry.paradigm.xyz | bash
    foundryup
+   ```
 
 2. 构建和测试合约：
+   ```bash
    cd server/ccy
    forge build
    forge test
-
-## 环境变量
-
-在 `web` 目录下创建一个 `.env.local` 文件：
-NEXT_PUBLIC_NFT_MARKET_ADDRESS=你的_nft_市场合约地址
-NEXT_PUBLIC_CCY_TOKEN_ADDRESS=你的_ccy_代币合约地址
-NEXT_PUBLIC_CCY_NFT_ADDRESS=你的_ccy_nft合约地址
+   ```
 
 ## 最佳实践
 
@@ -201,9 +214,9 @@ NEXT_PUBLIC_CCY_NFT_ADDRESS=你的_ccy_nft合约地址
 
 3. **NFTMarket.sol** - NFT 市场合约
    - 支持上架 NFT（指定 NFT 合约、Token ID 和价格）
-   - 支持使用 ERC20 代币购买 NFT
+   - 支持使用 ETH 购买 NFT
    - 支持取消 NFT 上架
-   - 包含平台手续费机制（默认 0.5%）
+   - 包含平台手续费机制
    - 支持平台提取手续费
 
 ### 关键功能
@@ -214,9 +227,9 @@ NEXT_PUBLIC_CCY_NFT_ADDRESS=你的_ccy_nft合约地址
    - 上架会触发 `NFTListed` 事件
 
 2. **购买 NFT**
-   - 用户可以使用 ERC20 代币购买上架的 NFT
+   - 用户可以使用 ETH 购买上架的 NFT
    - 购买成功后，NFT 转移给买家
-   - 卖家收到代币（扣除平台手续费）
+   - 卖家收到 ETH（扣除平台手续费）
    - 市场合约收取手续费
    - 购买会触发 `NFTPurchased` 事件
 
@@ -247,16 +260,6 @@ forge test
 forge coverage
 ```
 
-### 环境变量
-
-在 `server/ccy` 目录下创建 `.env` 文件：
-
-## 持续集成/持续部署
-
-项目使用 GitHub Actions 进行 CI/CD：
-- 前端部署到 Vercel
-- 智能合约自动测试和验证
-
 ## 贡献指南
 
 1. Fork 该项目
@@ -272,3 +275,4 @@ forge coverage
 图例：
 - ✅ 已实现
 - 🔄 计划/开发中
+- ❌ 暂未实现

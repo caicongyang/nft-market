@@ -6,36 +6,31 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useMarketNFTs } from '@/hooks/useMarketNFTs';
 import { NFTCard } from '@/components/NFTCard';
 import { useAccount } from 'wagmi';
+import { useEffect, useState } from 'react';
 
 export default function Home() {
   const { nfts, isLoading, error } = useMarketNFTs();
   const { isConnected } = useAccount();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-pink-50">
       <header className="bg-gradient-to-r from-pink-300 via-purple-200 to-pink-300 shadow-md">
         <div className="container mx-auto px-4 py-6 flex justify-between items-center">
           <div className="flex items-center">
-            <Image 
-              src="/images/cute-logo.png" 
-              alt="最可爱的女儿" 
-              width={50} 
-              height={50} 
-              className="rounded-full"
-              onError={(e) => {
-                const imgElement = e.currentTarget as HTMLImageElement;
-                imgElement.src = "https://via.placeholder.com/50?text=💖";
-                imgElement.onerror = null;
-              }}
-            />
-            <h1 className="ml-3 text-2xl font-bold text-pink-600">最可爱的女儿</h1>
+            <h1 className="text-2xl font-bold text-pink-600">最可爱的女儿</h1>
           </div>
-          <ConnectButton />
+          <div className="h-[38px]">
+            {isClient && <ConnectButton />}
+          </div>
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-12">
-        {/* 1. 热门NFT列表区域 */}
         <section className="mb-16">
           <div className="flex justify-between items-center mb-6">
             <h2 className="text-3xl font-bold text-pink-600">热门女儿NFT</h2>
@@ -44,43 +39,43 @@ export default function Home() {
             </Link>
           </div>
           
-          {isConnected ? (
-            isLoading ? (
+          <div className="min-h-[300px]">
+            {!isClient ? (
               <div className="text-center py-10">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
-                <p className="mt-2 text-pink-500">正在加载最可爱的女儿NFT...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center py-10 text-pink-600">
-                <p>加载NFT时出错: {error}</p>
-                <p className="mt-2">请连接钱包或稍后再试</p>
-              </div>
-            ) : nfts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {nfts.map((nft) => (
-                  <NFTCard key={`${nft.nftContract}-${nft.tokenId}`} nft={nft} />
-                ))}
+                <p className="mt-2 text-pink-500">加载中...</p>
               </div>
             ) : (
-              <div className="text-center py-10 bg-white rounded-lg shadow border-2 border-pink-200">
-                <div className="text-6xl mb-4">👧</div>
-                <h3 className="text-xl font-bold text-pink-600 mb-2">暂无NFT列表</h3>
-                <p className="text-gray-600 mb-4">目前市场上还没有可爱女儿NFT，成为第一个创建者吧！</p>
-                <Link href="/create" className="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition inline-block">
-                  创建我的女儿NFT
-                </Link>
-              </div>
-            )
-          ) : (
-            <div className="text-center py-10 bg-white rounded-lg shadow border-2 border-pink-200">
-              <div className="text-6xl mb-4">🔗</div>
-              <h3 className="text-xl font-bold text-pink-600 mb-2">请连接钱包</h3>
-              <p className="text-gray-600 mb-4">连接您的钱包以查看最可爱的女儿NFT</p>
-            </div>
-          )}
+              isLoading ? (
+                <div className="text-center py-10">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-pink-500"></div>
+                  <p className="mt-2 text-pink-500">正在加载最可爱的女儿NFT...</p>
+                </div>
+              ) : error ? (
+                <div className="text-center py-10 text-pink-600">
+                  <p>加载NFT时出错: {error}</p>
+                  <p className="mt-2">请稍后再试</p>
+                </div>
+              ) : nfts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {nfts.map((nft) => (
+                    <NFTCard key={`${nft.nftContract}-${nft.tokenId}`} nft={nft} />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-10 bg-white rounded-lg shadow border-2 border-pink-200">
+                  <div className="text-6xl mb-4">👧</div>
+                  <h3 className="text-xl font-bold text-pink-600 mb-2">暂无NFT列表</h3>
+                  <p className="text-gray-600 mb-4">目前市场上还没有可爱女儿NFT，成为第一个创建者吧！</p>
+                  <Link href="/mint" className="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition inline-block">
+                    创建我的女儿NFT
+                  </Link>
+                </div>
+              )
+            )}
+          </div>
         </section>
 
-        {/* 2. 获取免费代币区域 */}
         <section className="bg-gradient-to-r from-pink-200 via-purple-100 to-pink-200 rounded-lg p-8 mb-16">
           <div className="text-center">
             <h2 className="text-2xl font-bold text-pink-600 mb-6">获取免费代币开始您的收藏之旅</h2>
@@ -94,7 +89,6 @@ export default function Home() {
           </div>
         </section>
 
-        {/* 3. 介绍区域 */}
         <section className="text-center mb-16">
           <h2 className="text-4xl font-bold text-pink-600 mb-6">收集最可爱的女儿NFT系列</h2>
           <p className="text-lg text-gray-600 max-w-3xl mx-auto">
@@ -103,14 +97,13 @@ export default function Home() {
           </p>
         </section>
 
-        {/* 4. 功能区域 */}
         <section className="grid grid-cols-1 md:grid-cols-3 gap-10 mb-20">
           <div className="bg-white rounded-lg shadow-lg p-6 transform transition duration-300 hover:scale-105 border-2 border-pink-200">
             <div className="text-pink-500 text-4xl mb-4 flex justify-center">🦄</div>
             <h3 className="text-xl font-bold text-center text-pink-600 mb-3">创建你的女儿NFT</h3>
             <p className="text-gray-600 text-center">铸造独一无二的女儿主题NFT，展示你心目中最可爱的女儿形象！</p>
             <div className="mt-6 text-center">
-              <Link href="/create" className="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition">
+              <Link href="/mint" className="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition">
                 开始创建
               </Link>
             </div>
@@ -134,8 +127,8 @@ export default function Home() {
             <div className="mt-6 text-center">
               <Link href="/profile" className="px-6 py-2 bg-pink-500 text-white rounded-full hover:bg-pink-600 transition">
                 我的收藏
-              </Link>
-            </div>
+        </Link>
+      </div>
           </div>
         </section>
       </main>

@@ -56,7 +56,7 @@ export function NFTCard({
   const metadata = nft.metadata || {
     name: `NFT #${nft.tokenId}`,
     description: "No description available",
-    image: "https://via.placeholder.com/300"
+    image: "/images/placeholder-nft.jpg"
   };
 
   return (
@@ -68,7 +68,7 @@ export function NFTCard({
           className="w-full h-full object-cover transition-transform hover:scale-105"
           onError={(e) => {
             const target = e.target as HTMLImageElement;
-            target.src = "https://via.placeholder.com/300?text=No+Image";
+            target.src = "/images/placeholder-nft.jpg";
           }}
         />
         {nft.price && (
